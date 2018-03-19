@@ -31,6 +31,9 @@
       <span id="contractAddr"></span>
       <button onclick="changeContractAddr()">변경</button>
     </li>
+    <li>
+      <button onclick="getHistoryOfContractAddr()">히스토리</button>
+    </li>
     <li>내 어카운트 주소:
       <span id="accountAddr"></span>
     </li>
@@ -49,7 +52,7 @@
   컨트랙트 소스
   <script src="https://gist.github.com/atomrigs/7c633570496b79623bed5d1286f93f3a.js"></script> HTML 소스
   <br>
-  <a href="https://github.com/80xer/dapp-test/blob/master/index.html">https://github.com/80xer/dapp-test/blob/master/index.html</a>
+  <a href="https://github.com/80xer/dapp-test/blob/master/simplestorage.html">https://github.com/80xer/dapp-test/blob/master/simplestorage.html</a>
   <br>
   <br>
   <p>
@@ -62,6 +65,7 @@
 <script src="https://cdn.rawgit.com/ethereum/web3.js/develop/dist/web3.js"></script>
 <!-- script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script -->
 <script>
+  var contractAddress = '0x8bd98496c875a1090ec0d807a7d45C5aAEf459b2';
   var abi = [{ "constant": false, "inputs": [{ "name": "x", "type": "uint256" }], "name": "set", "outputs": [], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "get", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "type": "function" }];
   var simpleStorageContract;
   var simpleStorage;
@@ -83,11 +87,10 @@
 
   function startApp() {
     simpleStorageContract = web3.eth.contract(abi);
-    var contractAddress = '0x8bd98496c875a1090ec0d807a7d45C5aAEf459b2';
-    init(contractAddress);
+    init();
   }
 
-  function init(contractAddress) {
+  function init() {
     simpleStorage = simpleStorageContract.at(contractAddress);
     document.getElementById('contractAddr').innerHTML = getLink(contractAddress);
     web3.eth.getAccounts(function (e, r) {
@@ -98,7 +101,7 @@
   }
 
   function getLink(addr) {
-    return '<a target="_blank" href=https://testnet.etherscan.io/address/' + addr + '>' + addr + '</a>';
+    return '<a target="_blank" href=https://ropsten.etherscan.io/address/' + addr + '>' + addr + '</a>';
   }
 
   function getValue() {
@@ -137,10 +140,20 @@
     var addr = prompt('변경할 컨트랙트 주소를 입력하세요.');
 
     if (addr) {
-      init(addr);
+      contractAddress = addr
+      init();
     }
   }
 
+  function getHistoryOfContractAddr() {
+    web3.eth.filter({
+      fromBlock: 0,
+      toBlock: 'latest',
+      address: contractAddress
+    }).get(function (err, result) {
+      console.log('result', result);
+    })
+  }
 </script>
 
 </html>
